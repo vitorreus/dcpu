@@ -51,12 +51,20 @@ function set(b:number,a:number){
 	switch (b){
 		case 0:
 			registers.A = value(a);
+			break;
+		case Value.NEXT_WORD_REFERENCE:
+			let val = value(a);
+			console.log('value(a)',val)
+			let reference = memory[++PC];
+			memory[reference] = val;
+			break;
 	}
 }
 
 function value(ab:number){
+	console.log('ab',ab)
 	switch (ab){
-		case Value.NEXT_WORD:
+		case Value.NEXT_WORD_LITERAL:
 			return memory[++PC];
 	}
 }
@@ -65,13 +73,23 @@ function execute(instruction:Instruction){
 	switch (instruction.op){
 		case  BasicOpcode.SET:
 			set(instruction.b,instruction.a);
+			break;
 	}
+	PC++
 }
 
-execute(decode(memory[PC++]))
+execute(decode(memory[PC]))
+
 console.log('A',registers.A);
 console.log('PC',PC);
 
-execute(decode(memory[PC++]))
+let instruction = decode(memory[PC]);
+
+console.log(instruction)
+
+//SET b, a
+//SET [0x1000], 0x20
+//7fc1 0020 1000
+execute(instruction)
 console.log('[0x1000]',memory[0x1000]);
 console.log('PC',PC);
